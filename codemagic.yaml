@@ -6,7 +6,7 @@ workflows:
 
     environment:
       xcode: latest
-      node: 18
+      node: 22
       vars:
         BUNDLE_ID: it.gestionescadenze.app
         XCODE_PROJECT: App.xcodeproj
