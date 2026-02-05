@@ -1,0 +1,16 @@
+project_id = "igptngecujtkofhbzjmj"
+
+[functions.check-reminders]
+verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.stripe-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.stripe-portal]
+verify_jwt = false

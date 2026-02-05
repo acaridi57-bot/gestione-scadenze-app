@@ -1,0 +1,84 @@
+workflows:
+  ios-capacitor:
+    name: iOS Capacitor Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    
+    environment:
+      xcode: latest
+      node: 22
+      vars:
+        BUNDLE_ID: "it.gestionescadenze.app"
+        APP_NAME: "Gestione Scadenze"
+    
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
+      
+      - name: Build web app
+        script: |
+          npm run build
+      
+      - name: Setup iOS platform
+        script: |
+          rm -rf ios
+          npx cap add ios
+          npx cap sync ios
+      
+      - name: Set Bundle Identifier
+        script: |
+          cd ios/App
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_ID" App/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $APP_NAME" App/Info.plist
+      
+      - name: Update Xcode project settings
+        script: |
+          cd ios/App
+          sed -i '' "s/PRODUCT_BUNDLE_IDENTIFIER = .*;/PRODUCT_BUNDLE_IDENTIFIER = $BUNDLE_ID;/g" App.xcodeproj/project.pbxproj
+      
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios/App
+          pod install
+      
+      - name: Copy ExportOptions to ios folder
+        script: |
+          cp ios-export-options.plist ios/App/ExportOptions.plist
+          sed -i '' "s/\${CM_DEVELOPMENT_TEAM}/$CM_DEVELOPMENT_TEAM/g" ios/App/ExportOptions.plist
+      
+      - name: Build signed archive (AUTOMATIC SIGNING)
+        script: |
+          cd ios/App
+          xcodebuild \
+            -workspace "App.xcworkspace" \
+            -scheme "App" \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            archive \
+            -allowProvisioningUpdates \
+            DEVELOPMENT_TEAM="$CM_DEVELOPMENT_TEAM" \
+            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGN_IDENTITY="Apple Distribution"
+      
+      - name: Export IPA
+        script: |
+          cd ios/App
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist ExportOptions.plist \
+            -allowProvisioningUpdates
+    
+    artifacts:
+      - ios/App/build/**/*.ipa
+      - ios/App/build/**/*.xcarchive
+    
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Beta Testers

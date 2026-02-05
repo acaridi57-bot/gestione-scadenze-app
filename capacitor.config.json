@@ -1,0 +1,11 @@
+{
+  "appId": "it.gestionescadenze.app",
+  "appName": "Gestione Scadenze",
+  "webDir": "dist",
+  "server": {
+    "url": "https://fdeaa805-c9b8-4bdb-8faa-04b1243917f8.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}
+
+

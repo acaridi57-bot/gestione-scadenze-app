@@ -1,0 +1,86 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "app.lovable.gestione-scadenze",
+  "productName": "Gestione Scadenze",
+  "extraMetadata": {
+    "main": "index.js",
+    "type": "commonjs"
+  },
+  "beforePack": "./electron-builder-beforePack.cjs",
+  "afterPack": "./electron-builder-afterPack.cjs",
+  "asar": true,
+  "npmRebuild": false,
+  "nodeGypRebuild": false,
+  "buildDependenciesFromSource": false,
+  "removePackageScripts": true,
+  "directories": {
+    "output": "release",
+    "buildResources": "build-resources"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "index.js",
+    "package.json"
+  ],
+  "publish": {
+    "provider": "github",
+    "owner": "GITHUB_USERNAME",
+    "repo": "GITHUB_REPO_NAME",
+    "releaseType": "release"
+  },
+  "mac": {
+    "category": "public.app-category.productivity",
+    "icon": "public/pwa-512x512.png",
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "darkModeSupport": true,
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    }
+  },
+  "win": {
+    "icon": "public/pwa-512x512.png",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      }
+    ]
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "public/pwa-512x512.png",
+    "uninstallerIcon": "public/pwa-512x512.png",
+    "installerHeaderIcon": "public/pwa-512x512.png",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Gestione Scadenze"
+  }
+}

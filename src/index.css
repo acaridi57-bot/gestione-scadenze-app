@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
+    --primary: 145 90% 26%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 45%;
+    --accent: 145 90% 26%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 5% 90%;
+    --input: 240 5% 90%;
+    --ring: 145 90% 26%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 10% 10%;
+    --sidebar-primary: 145 90% 26%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 10% 10%;
+    --sidebar-border: 240 5% 90%;
+    --sidebar-ring: 145 90% 26%;
+    
+    --income: 160 60% 30%;
+    --income-foreground: 0 0% 100%;
+    --expense: 16 80% 55%;
+    --expense-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --success: 160 60% 30%;
+    --success-foreground: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    /* Prevent iOS text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Smooth scrolling with fallback */
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    /* Prevent pull-to-refresh on mobile */
+    overscroll-behavior-y: contain;
+    /* Better text rendering cross-browser */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Fix for Safari flexbox issues */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Better button styling cross-browser */
+  button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Fix for iOS input zoom */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  
+  @media (min-width: 768px) {
+    input, textarea, select {
+      font-size: inherit;
+    }
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-card/80 border border-border/50;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+  }
+  
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(145, 90%, 26%), hsl(140, 85%, 22%));
+  }
+  
+  .gradient-income {
+    background: linear-gradient(135deg, hsl(160, 60%, 35%), hsl(150, 55%, 40%));
+  }
+  
+  .gradient-expense {
+    background: linear-gradient(135deg, hsl(16, 80%, 55%), hsl(24, 80%, 50%));
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 40px hsla(145, 90%, 26%, 0.15);
+  }
+  
+  .shadow-card {
+    box-shadow: 0 4px 24px hsla(0, 0%, 0%, 0.08);
+  }
+
+  .banknote-container {
+    -webkit-perspective: 1000px;
+    perspective: 1000px;
+  }
+
+  .banknote-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .banknote-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    -webkit-animation: shine 3s infinite;
+    animation: shine 3s infinite;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  @-webkit-keyframes shine {
+    0% {
+      left: -100%;
+    }
+    50%, 100% {
+      left: 150%;
+    }
+  }
+  
+  @keyframes shine {
+    0% {
+      left: -100%;
+    }
+    50%, 100% {
+      left: 150%;
+    }
+  }
+
+  .coin-rotate {
+    -webkit-animation: coinRotate 8s linear infinite;
+    animation: coinRotate 8s linear infinite;
+  }
+
+  @-webkit-keyframes coinRotate {
+    0% {
+      -webkit-transform: rotateY(0deg);
+      transform: rotateY(0deg);
+    }
+    100% {
+      -webkit-transform: rotateY(360deg);
+      transform: rotateY(360deg);
+    }
+  }
+  
+  @keyframes coinRotate {
+    0% {
+      -webkit-transform: rotateY(0deg);
+      transform: rotateY(0deg);
+    }
+    100% {
+      -webkit-transform: rotateY(360deg);
+      transform: rotateY(360deg);
+    }
+  }
+
+  .coin-container {
+    -webkit-perspective: 500px;
+    perspective: 500px;
+  }
+  
+  /* Safari-specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    .glass {
+      background: hsla(0, 0%, 100%, 0.9);
+    }
+  }
+}

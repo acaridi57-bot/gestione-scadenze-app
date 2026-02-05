@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <title>Gestione Scadenze</title>
+    <meta name="description" content="Gestisci le tue finanze personali: transazioni, promemoria, scadenze e notifiche. App disponibile su iOS, Android, Windows e Mac." />
+    <meta name="author" content="Gestione Scadenze" />
+    <meta name="keywords" content="finanze, scadenze, promemoria, transazioni, budget, gestione denaro" />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Gestione Scadenze" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Gestione Scadenze" />
+    <meta name="msapplication-TileColor" content="#16a34a" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/pwa-72x72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="/pwa-96x96.png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/pwa-128x128.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/pwa-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/pwa-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/pwa-192x192.png" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gestione Scadenze - Finanze Personali" />
+    <meta property="og:description" content="Gestisci le tue finanze personali: transazioni, promemoria e scadenze." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/pwa-512x512.png" />
+    <meta property="og:locale" content="it_IT" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gestione Scadenze" />
+    <meta name="twitter:description" content="Gestisci le tue finanze personali" />
+    <meta name="twitter:image" content="/pwa-512x512.png" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- DNS Prefetch for Supabase -->
+    <link rel="dns-prefetch" href="https://igptngecujtkofhbzjmj.supabase.co" />
+    
+    <style>
+      /* Safe area padding for iOS */
+      :root {
+        --sat: env(safe-area-inset-top, 0px);
+        --sar: env(safe-area-inset-right, 0px);
+        --sab: env(safe-area-inset-bottom, 0px);
+        --sal: env(safe-area-inset-left, 0px);
+      }
+      
+      /* Critical CSS - Loading spinner */
+      html, body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        -webkit-text-size-adjust: 100%;
+      }
+      
+      #app-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        -ms-flex-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        background: #ffffff;
+        z-index: 9999;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        #app-loader {
+          background: #0a0a0a;
+          color: #ffffff;
+        }
+      }
+      
+      #app-loader .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e5e5;
+        border-top-color: #16a34a;
+        border-radius: 50%;
+        -webkit-animation: spin 1s linear infinite;
+        animation: spin 1s linear infinite;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        #app-loader .spinner {
+          border-color: #333333;
+          border-top-color: #22c55e;
+        }
+      }
+      
+      @-webkit-keyframes spin {
+        to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+      }
+      
+      @keyframes spin {
+        to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+      }
+      
+      #app-loader p {
+        margin-top: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        font-size: 14px;
+        color: #666666;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        #app-loader p {
+          color: #999999;
+        }
+      }
+      
+      /* Hide loader when React mounts */
+      #root:not(:empty) ~ #app-loader,
+      #root:not(:empty) #app-loader,
+      .app-loaded #app-loader {
+        display: none !important;
+        opacity: 0;
+        visibility: hidden;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    
+    <!-- Loading indicator outside root for better iOS compatibility -->
+    <div id="app-loader" aria-label="Caricamento applicazione">
+      <div class="spinner" role="status" aria-hidden="true"></div>
+      <p>Caricamento...</p>
+    </div>
+    
+    <noscript>
+      <div style="display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;min-height:100vh;padding:20px;text-align:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+        <h1 style="color:#16a34a;margin-bottom:16px;">Gestione Scadenze</h1>
+        <p style="color:#666;max-width:400px;">
+          Per utilizzare questa applicazione è necessario abilitare JavaScript nel tuo browser.
+        </p>
+      </div>
+    </noscript>
+    
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Hide loader after React mounts -->
+    <script>
+      // Mark body when app loads
+      if (document.readyState === 'complete') {
+        document.body.classList.add('app-loaded');
+      } else {
+        window.addEventListener('load', function() {
+          setTimeout(function() {
+            document.body.classList.add('app-loaded');
+          }, 100);
+        });
+      }
+    </script>
+    
+    <!-- Fallback for older browsers that don't support ES modules -->
+    <script nomodule>
+      document.getElementById('app-loader').innerHTML = '<p style="color:#666;text-align:center;padding:20px;">Il tuo browser non è supportato. Aggiorna il browser per utilizzare questa applicazione.</p>';
+    </script>
+  </body>
+</html>
