@@ -1,54 +1,57 @@
+
 workflows:
   ios-capacitor:
-    name: iOS Capacitor – Build & Sign (Automatic Signing)
-    max_build_duration: 120
-    instance_type: mac_mini_m1
-
+    name: iOS Capacitor Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: frontend
+    integrations:
+      app_store_connect: Codemagic #this is the appstoreAPI key that you've added under teams >personal account > integrations > developer portal > manage keys
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: it.gestionescadenze.GestioneScadenze
       xcode: latest
       node: 22
       vars:
-        BUNDLE_ID: it.gestionescadenze.app
-        XCODE_PROJECT: App.xcodeproj
-        XCODE_SCHEME: App
-        DEVELOPMENT_TEAM: DCC5U8ZA45
-
+        XCODE_PROJECT: "frontend/ios/App/App.xcodeproj"
+        SCHEME: "App"
     scripts:
-      - name: Install Node dependencies
+      - name: Install dependencies
         script: |
-          npm ci
+          npm install
+          npm install @capacitor/core @capacitor/cli @capacitor/ios
 
       - name: Build web app
         script: |
           npm run build
 
-      - name: Sync Capacitor iOS
+      - name: Setup iOS platform
         script: |
+
+          npx cap add ios
           npx cap sync ios
 
-      - name: Build signed archive (AUTOMATIC SIGNING)
+      - name: Set up code signing settings on Xcode project
         script: |
-          cd ios/App
-          xcodebuild \
-            -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Release \
-            -archivePath build/App.xcarchive \
-            archive \
-            -allowProvisioningUpdates \
-            DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
-            PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
-            CODE_SIGN_STYLE=Automatic
-
-      - name: Export IPA
+          xcode-project use-profiles
+      - name: Increment build number
         script: |
-          cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ExportOptions.plist \
-            -allowProvisioningUpdates
+          cd $CM_BUILD_DIR/ios/App
+          agvtool new-version -all 1.0.$(($PROJECT_BUILD_NUMBER))
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME" \
+            --archive-flags="-destination 'generic/platform=iOS'" 
 
     artifacts:
-      - ios/App/build/ipa/*.ipa
-      - ios/App/build/App.xcarchive
+      - build/ios/xcarchive/*.xcarchive
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
