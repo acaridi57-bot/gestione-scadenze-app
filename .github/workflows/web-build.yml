@@ -18,9 +18,15 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies (no Electron signing)
+        run: npm ci --omit=optional
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          CSC_FOR_PULL_REQUEST: false
 
       - name: Build web
         run: npm run build
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          CSC_FOR_PULL_REQUEST: false
 
