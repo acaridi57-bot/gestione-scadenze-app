@@ -21,8 +21,10 @@ jobs:
     - name: Install dependencies
       run: npm install --force
     
-    - name: Install Rollup native binary explicitly
-      run: npm install @rollup/rollup-linux-x64-gnu --save-optional --force
+    - name: Install native binaries explicitly
+      run: |
+        npm install @rollup/rollup-linux-x64-gnu --save-optional --force
+        npm install @swc/core-linux-x64-gnu --save-optional --force
     
     - name: Build
       run: npm run build
