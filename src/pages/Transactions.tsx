@@ -18,7 +18,9 @@ import {
   Search,
   FolderOpen,
   Save,
-  Eye
+  Eye,
+  RotateCcw,
+  History
 } from 'lucide-react';
 import { useRecordsPerPage } from '@/hooks/useRecordsPerPage';
 import { RecordsPerPageSelector } from '@/components/RecordsPerPageSelector';
@@ -80,18 +82,24 @@ export default function Transactions() {
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showViewDialog, setShowViewDialog] = useState(false);
+   const [showViewDialog, setShowViewDialog] = useState(false);
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
   const [backupFolder, setBackupFolder] = useState<string>(() => {
     return localStorage.getItem('backupFolder') || '';
   });
+  const [backupHistory, setBackupHistory] = useState<Array<{ date: string; name: string; data: string }>>(() => {
+    try {
+      const stored = localStorage.getItem('backupHistory');
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
 
-  // Auto-save backup on page unload
-  const saveBackup = useCallback(() => {
-    if (transactions.length === 0) return;
-    
-    const data = {
+  // Create backup data from existing transactions only
+  const createBackupData = useCallback(() => {
+    if (transactions.length === 0) return null;
+    return {
       backup_date: new Date().toISOString(),
-      auto_save: true,
+      backup_folder: backupFolder,
       transactions: transactions.map(t => ({
         id: t.id,
         date: t.date,
@@ -100,26 +108,143 @@ export default function Transactions() {
         paid_amount: t.paid_amount,
         description: t.description,
         category: t.categories?.name,
+        category_id: t.category_id,
+        payment_method_id: t.payment_method_id,
         recurring: t.recurring,
+        start_date: t.start_date,
+        end_date: t.end_date,
+        is_partial: t.is_partial,
+        plan_id: t.plan_id,
+        installment_index: t.installment_index,
+        installment_total: t.installment_total,
       }))
     };
-    
-    // Store in localStorage as fallback
-    localStorage.setItem('lastAutoBackup', JSON.stringify(data));
-    localStorage.setItem('lastAutoBackupDate', new Date().toISOString());
-  }, [transactions]);
+  }, [transactions, backupFolder]);
 
+  // Save backup to history in localStorage
+  const saveBackupToHistory = useCallback((data: ReturnType<typeof createBackupData>) => {
+    if (!data) return;
+    const name = `backup_${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`;
+    const entry = { date: new Date().toISOString(), name, data: JSON.stringify(data) };
+    const newHistory = [entry, ...backupHistory].slice(0, 20); // Keep last 20
+    setBackupHistory(newHistory);
+    localStorage.setItem('backupHistory', JSON.stringify(newHistory));
+    return entry;
+  }, [backupHistory]);
+
+  // Auto-save backup on page unload with "Salvataggio Sessione" message
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      saveBackup();
+      const data = createBackupData();
+      if (data) {
+        localStorage.setItem('lastAutoBackup', JSON.stringify(data));
+        localStorage.setItem('lastAutoBackupDate', new Date().toISOString());
+        // Save to history
+        const name = `auto_${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`;
+        try {
+          const stored = localStorage.getItem('backupHistory');
+          const history = stored ? JSON.parse(stored) : [];
+          const entry = { date: new Date().toISOString(), name, data: JSON.stringify(data) };
+          const newHistory = [entry, ...history].slice(0, 20);
+          localStorage.setItem('backupHistory', JSON.stringify(newHistory));
+        } catch {}
+      }
+      // Show "Salvataggio Sessione" message
+      e.preventDefault();
+      e.returnValue = 'Salvataggio Sessione in corso...';
+      return 'Salvataggio Sessione in corso...';
     };
     
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [createBackupData]);
+
+  // Handle restore from backup
+  const handleRestore = async (backupData: string) => {
+    try {
+      const parsed = JSON.parse(backupData);
+      if (!parsed.transactions || !Array.isArray(parsed.transactions)) {
+        toast.error('Formato backup non valido');
+        return;
+      }
+      // Download as JSON for the user to import
+      const blob = new Blob([JSON.stringify(parsed, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ripristino_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(`Backup ripristinato con ${parsed.transactions.length} transazioni. Usa "Importa" per caricarle.`);
+      setShowRestoreDialog(false);
+    } catch {
+      toast.error('Errore nel ripristino del backup');
+    }
+  };
+
+  // Handle backup folder selection - use input with webkitdirectory for broad compatibility
+  const handleSelectBackupFolder = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    // @ts-ignore - webkitdirectory is non-standard but widely supported
+    input.webkitdirectory = true;
+    // @ts-ignore
+    input.directory = true;
+    input.onchange = () => {
+      const files = input.files;
+      if (files && files.length > 0) {
+        // Extract folder path from the first file's webkitRelativePath
+        const relativePath = (files[0] as any).webkitRelativePath || '';
+        const folderName = relativePath.split('/')[0] || 'Desktop';
+        setBackupFolder(folderName);
+        localStorage.setItem('backupFolder', folderName);
+        toast.success(`Cartella backup selezionata: ${folderName}`);
+      }
     };
-  }, [saveBackup]);
+    input.click();
+  };
+
+  // Handle manual save backup
+  const handleManualSave = () => {
+    const data = createBackupData();
+    if (!data || data.transactions.length === 0) {
+      toast.info('Nessuna transazione da salvare');
+      return;
+    }
+    // Save to history
+    saveBackupToHistory(data);
+    // Download file
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `backup_transazioni_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Backup salvato');
+  };
+
+  // Handle restore from file upload
+  const handleRestoreFromFile = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const content = ev.target?.result as string;
+        handleRestore(content);
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
 
   const handleVoiceToggle = () => {
     if (isPlaying) {
@@ -1093,53 +1218,34 @@ export default function Transactions() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              const folder = prompt('Inserisci il percorso della cartella backup:', backupFolder);
-              if (folder !== null) {
-                setBackupFolder(folder);
-                localStorage.setItem('backupFolder', folder);
-                toast.success('Cartella backup salvata');
-              }
-            }}
+            onClick={handleSelectBackupFolder}
             className="gap-2 text-primary border-primary/30 hover:bg-primary/10"
+            title={backupFolder ? `Cartella: ${backupFolder}` : 'Seleziona cartella backup'}
           >
             <FolderOpen className="w-4 h-4" />
-            Cartella Backup
+            {backupFolder ? `📁 ${backupFolder}` : 'Cartella Backup'}
           </Button>
           
           {/* Manual Save Button */}
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              const data = {
-                backup_date: new Date().toISOString(),
-                transactions: transactions.map(t => ({
-                  id: t.id,
-                  date: t.date,
-                  type: t.type,
-                  amount: t.amount,
-                  paid_amount: t.paid_amount,
-                  description: t.description,
-                  category: t.categories?.name,
-                  recurring: t.recurring,
-                }))
-              };
-              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-              const url = URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = `backup_transazioni_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.json`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
-              toast.success('Backup salvato');
-            }}
+            onClick={handleManualSave}
             className="gap-2 bg-income text-income-foreground hover:bg-income/90"
           >
             <Save className="w-4 h-4" />
             Salva Backup
+          </Button>
+
+          {/* Restore Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowRestoreDialog(true)}
+            className="gap-2 text-primary border-primary/30 hover:bg-primary/10"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Ripristina
           </Button>
         </div>
 
@@ -1301,6 +1407,76 @@ export default function Transactions() {
                 <Button onClick={() => { handlePrint(); setShowViewDialog(false); }} className="gap-2">
                   <Eye className="w-4 h-4" />
                   Stampa
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Restore Dialog - Shows backup history */}
+        <Dialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <History className="w-5 h-5" />
+                Ripristina Backup
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Upload backup file */}
+              <Button
+                variant="outline"
+                onClick={handleRestoreFromFile}
+                className="w-full gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                Carica file backup (.json)
+              </Button>
+
+              {/* Backup history list */}
+              {backupHistory.length > 0 ? (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-muted-foreground">Backup precedenti</h4>
+                  {backupHistory.map((backup, index) => {
+                    let transCount = 0;
+                    try {
+                      const parsed = JSON.parse(backup.data);
+                      transCount = parsed.transactions?.length || 0;
+                    } catch {}
+                    return (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors"
+                      >
+                        <div>
+                          <div className="font-medium text-sm">{backup.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {format(new Date(backup.date), 'dd/MM/yyyy HH:mm')} • {transCount} transazioni
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleRestore(backup.data)}
+                          className="gap-1"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          Ripristina
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nessun backup disponibile
+                </div>
+              )}
+
+              <div className="flex justify-end pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowRestoreDialog(false)}>
+                  Chiudi
                 </Button>
               </div>
             </div>
