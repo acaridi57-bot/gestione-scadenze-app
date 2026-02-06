@@ -3,29 +3,29 @@ workflows:
     name: iOS Capacitor – Build & Sign (Automatic Signing)
     max_build_duration: 120
     instance_type: mac_mini_m1
-
+    
     environment:
       xcode: latest
       node: 22
-      vars:
+      vars: 
         BUNDLE_ID: it.gestionescadenze.app
         XCODE_PROJECT: App.xcodeproj
         XCODE_SCHEME: App
         DEVELOPMENT_TEAM: DCC5U8ZA45
-
+      
     scripts:
       - name: Install Node dependencies
         script: |
           npm install
-
+        
       - name: Build web app
         script: |
           npm run build
-
+            
       - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
-
+            
       - name: Build signed archive (AUTOMATIC SIGNING)
         script: |
           cd ios/App
@@ -39,14 +39,14 @@ workflows:
             DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
             PRODUCT_BUNDLE_IDENTIFIER="$BUNDLE_ID" \
             CODE_SIGN_STYLE=Automatic
-
+    
       - name: Export IPA
         script: |
           cd ios/App
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist ios-export-options.plist \
+            -exportOptionsPlist ../../ios-export-options.plist \
             -allowProvisioningUpdates
 
     artifacts:
