@@ -14,12 +14,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '22'
-        cache: 'npm'
     
-    - name: Clean install dependencies
-      run: |
-        rm -rf node_modules package-lock.json
-        npm install
+    - name: Clean npm cache
+      run: npm cache clean --force
+    
+    - name: Install dependencies
+      run: npm install --force
+    
+    - name: Install Rollup native binary explicitly
+      run: npm install @rollup/rollup-linux-x64-gnu --save-optional --force
     
     - name: Build
       run: npm run build
