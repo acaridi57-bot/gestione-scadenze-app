@@ -54,8 +54,3 @@ workflows:
 
     artifacts:
       - ios/App/build/ipa/*.ipa
-      - ios/App/build/App.xcarchive
-    
-    publishing:
-      app_store_connect:
-        submit_to_testflight: true
