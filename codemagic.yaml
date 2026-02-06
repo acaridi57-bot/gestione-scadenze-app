@@ -55,13 +55,3 @@ workflows:
     artifacts:
       - ios/App/build/ipa/*.ipa
       - ios/App/build/App.xcarchive
-EOF
-
-# Verifica
-cat codemagic.yaml | head -5
-
-# Commit
-git add codemagic.yaml
-git commit -m "fix: switch to automatic code signing"
-git push origin main
-
