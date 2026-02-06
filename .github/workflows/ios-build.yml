@@ -100,8 +100,6 @@ jobs:
           <string>app-store</string>
           <key>teamID</key>
           <string>DCC5U8ZA45</string>
-          <key>uploadBitcode</key>
-          <false/>
           <key>uploadSymbols</key>
           <true/>
           <key>signingStyle</key>
