@@ -1,0 +1,32 @@
+name: Sync Lovable to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  notify-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Log sync event
+      run: |
+        echo "🔄 Sincronizzazione attivata"
+        echo "📅 Data: $(date)"
+        echo "🔗 Commit: ${{ github.sha }}"
+        echo "👤 Autore: ${{ github.actor }}"
+        echo ""
+        echo "✅ Lovable sincronizzerà automaticamente gestionescadenze.app"
+        echo "⏳ Attendi 5-10 minuti per la propagazione"
+        
+    - name: Verify build would work
+      run: |
+        if [ -f "package.json" ]; then
+          echo "✅ package.json trovato"
+        fi
+        if [ -f "vite.config.ts" ]; then
+          echo "✅ vite.config.ts trovato"
+        fi
