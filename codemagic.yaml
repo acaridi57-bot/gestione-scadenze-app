@@ -34,23 +34,34 @@ workflows:
       - name: Build signed archive (AUTOMATIC SIGNING)
         script: |
           cd ios/App
-          xcode-project use-profiles
           xcodebuild \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME" \
             -configuration Release \
             -archivePath build/App.xcarchive \
             archive \
-            CODE_SIGN_STYLE=Manual
+            -allowProvisioningUpdates \
+            CODE_SIGN_STYLE=Automatic
     
       - name: Export IPA
         script: |
           cd ios/App
-          xcode-project use-profiles
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist ../../ios-export-options.plist
+            -exportOptionsPlist ../../ios-export-options.plist \
+            -allowProvisioningUpdates
 
     artifacts:
       - ios/App/build/ipa/*.ipa
+      - ios/App/build/App.xcarchive
+EOF
+
+# Verifica
+cat codemagic.yaml | head -5
+
+# Commit
+git add codemagic.yaml
+git commit -m "fix: switch to automatic code signing"
+git push origin main
+
