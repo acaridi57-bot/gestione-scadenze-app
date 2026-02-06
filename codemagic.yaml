@@ -16,7 +16,7 @@ workflows:
     scripts:
       - name: Install Node dependencies
         script: |
-          npm ci
+          npm install
 
       - name: Build web app
         script: |
@@ -46,7 +46,7 @@ workflows:
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist ExportOptions.plist \
+            -exportOptionsPlist ios-export-options.plist \
             -allowProvisioningUpdates
 
     artifacts:
