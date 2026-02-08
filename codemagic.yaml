@@ -12,7 +12,7 @@ workflows:
         XCODE_SCHEME: "App"
         BUNDLE_ID: "it.gestionescadenze.GestioneScadenze"
         APP_STORE_APPLE_ID: 1234567890
-      node: 18.17.0
+      node: 20.19.0
       xcode: 16.2
       cocoapods: default
     scripts:
