@@ -6,6 +6,11 @@
     <string>app-store</string>
     <key>teamID</key>
     <string>DCC5U8ZA45</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>it.gestionescadenze.GestioneScadenze</key>
+        <string>gestionescadenze_appstore_2027</string>
+    </dict>
     <key>uploadSymbols</key>
     <true/>
     <key>compileBitcode</key>
