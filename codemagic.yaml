@@ -7,11 +7,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: it.gestionescadenze.GestioneScadenze
-      vars:
-        XCODE_WORKSPACE: "App.xcworkspace"
-        XCODE_SCHEME: "App"
-        BUNDLE_ID: "it.gestionescadenze.GestioneScadenze"
-        APP_STORE_APPLE_ID: 1234567890
       node: 22.12.0
       xcode: 16.2
       cocoapods: default
@@ -22,33 +17,29 @@ workflows:
       - name: Build web app
         script: |
           npm run build
-      - name: Add iOS platform and export options
+      - name: Add iOS platform
         script: |
           npx cap add ios || true
           npx cap sync ios
-          cp ios-export-options.plist ios/App/
-      - name: Set up code signing settings on Xcode project
-        script: |
-          xcode-project use-profiles
-      - name: Build signed archive (MANUAL SIGNING)
+      - name: Build and sign iOS app
         script: |
           cd ios/App
           xcodebuild -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
-            archive \
-            CODE_SIGN_STYLE=Manual
+            -allowProvisioningUpdates \
+            archive
       - name: Export IPA
         script: |
           cd ios/App
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
+            -allowProvisioningUpdates \
             -exportOptionsPlist /Users/builder/export_options.plist
     artifacts:
       - ios/App/build/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
     publishing:
       email:
         recipients:
