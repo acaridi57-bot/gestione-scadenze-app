@@ -3,14 +3,17 @@
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store-connect</string>
+    <string>app-store</string>
     <key>teamID</key>
-    <string>${CM_DEVELOPMENT_TEAM}</string>
+    <string>DCC5U8ZA45</string>
     <key>uploadSymbols</key>
     <true/>
     <key>compileBitcode</key>
     <false/>
-    <key>destination</key>
-    <string>upload</string>
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>it.gestionescadenze.GestioneScadenze</key>
+        <string>GestioneScadenze AppStore 2027</string>
+    </dict>
 </dict>
 </plist>
