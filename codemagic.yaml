@@ -1,6 +1,6 @@
 workflows:
   ios-capacitor:
-    name: iOS Capacitor – Build & Sign (Automatic Signing)
+    name: iOS Capacitor – Build & Sign (Manual Signing)
     max_build_duration: 120
     instance_type: mac_mini_m1
     
@@ -12,9 +12,9 @@ workflows:
       node: 22
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: it.gestionescadenze.app
+        bundle_identifier: it.gestionescadenze.GestioneScadenze
       vars: 
-        BUNDLE_ID: it.gestionescadenze.app
+        BUNDLE_ID: it.gestionescadenze.GestioneScadenze
         XCODE_PROJECT: App.xcodeproj
         XCODE_SCHEME: App
       
@@ -31,7 +31,11 @@ workflows:
         script: |
           npx cap sync ios
             
-      - name: Build signed archive (AUTOMATIC SIGNING)
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+            
+      - name: Build signed archive (MANUAL SIGNING)
         script: |
           cd ios/App
           xcodebuild \
@@ -40,8 +44,7 @@ workflows:
             -configuration Release \
             -archivePath build/App.xcarchive \
             archive \
-            -allowProvisioningUpdates \
-            CODE_SIGN_STYLE=Automatic
+            CODE_SIGN_STYLE=Manual
     
       - name: Export IPA
         script: |
@@ -49,8 +52,7 @@ workflows:
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist ../../ios-export-options.plist \
-            -allowProvisioningUpdates
+            -exportOptionsPlist ../../ios-export-options.plist
 
     artifacts:
       - ios/App/build/ipa/*.ipa
