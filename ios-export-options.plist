@@ -10,10 +10,5 @@
     <true/>
     <key>compileBitcode</key>
     <false/>
-    <key>provisioningProfiles</key>
-    <dict>
-        <key>it.gestionescadenze.GestioneScadenze</key>
-        <string>GestioneScadenze AppStore 2027</string>
-    </dict>
 </dict>
 </plist>
