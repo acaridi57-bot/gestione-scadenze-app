@@ -21,6 +21,9 @@ workflows:
         script: |
           npx cap add ios || true
           npx cap sync ios
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
       - name: Build and sign iOS app
         script: |
           cd ios/App
@@ -28,7 +31,6 @@ workflows:
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
-            -allowProvisioningUpdates \
             archive
       - name: Export IPA
         script: |
@@ -36,7 +38,6 @@ workflows:
           xcodebuild -exportArchive \
             -archivePath build/App.xcarchive \
             -exportPath build/ipa \
-            -allowProvisioningUpdates \
             -exportOptionsPlist /Users/builder/export_options.plist
     artifacts:
       - ios/App/build/ipa/*.ipa
