@@ -17,28 +17,17 @@ workflows:
       - name: Build web app
         script: |
           npm run build
-      - name: Add iOS platform
+      - name: Sync Capacitor with iOS
         script: |
-          npx cap add ios || true
           npx cap sync ios
-      - name: Set up code signing
+      - name: Install CocoaPods dependencies
         script: |
-          xcode-project use-profiles
-      - name: Build and sign iOS app
+          cd ios/App && pod install
+      - name: Build iOS app
         script: |
-          cd ios/App
-          xcodebuild -project App.xcodeproj \
-            -scheme App \
-            -configuration Release \
-            -archivePath build/App.xcarchive \
-            archive
-      - name: Export IPA
-        script: |
-          cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist /Users/builder/export_options.plist
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
     artifacts:
       - ios/App/build/ipa/*.ipa
     publishing:
@@ -48,3 +37,6 @@ workflows:
         notify:
           success: true
           failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
