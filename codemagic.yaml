@@ -8,7 +8,7 @@ workflows:
         distribution_type: app_store
         bundle_identifier: it.gestionescadenze.GestioneScadenze
       node: 22.12.0
-      xcode: 16.2
+      xcode: 26.2
       cocoapods: default
     scripts:
       - name: Install dependencies
