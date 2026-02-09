@@ -44,7 +44,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - antonio.caridi@example.com
+          - acaridi57@gmail.com
         notify:
           success: true
           failure: true
