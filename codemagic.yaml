@@ -3,48 +3,51 @@ workflows:
     name: iOS Capacitor Build
     max_build_duration: 120
     instance_type: mac_mini_m2
+
     integrations:
-      app_store_connect: Codemagic2
+      app_store_connect: Codemagic
+
     environment:
+      xcode: latest
+      node: 22
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: it.gestionescadenze.GestioneScadenze
-      node: 22.12.0
-      xcode: 26.2
-      cocoapods: default
+        bundle_identifier: it.gestionescadenze.app
+
     scripts:
       - name: Install dependencies
         script: |
           npm install
+
       - name: Build web app
         script: |
           npm run build
-      - name: Sync Capacitor with iOS
+
+      - name: Sync Capacitor iOS
         script: |
           npx cap sync ios
-      - name: Set up code signing
+
+      - name: Build iOS archive
         script: |
-          keychain initialize
-          app-store-connect fetch-signing-files \
-            it.gestionescadenze.GestioneScadenze \
-            --type IOS_APP_STORE \
-            --create
-          keychain add-certificates
-          xcode-project use-profiles
-      - name: Build iOS app
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            archive \
+            CODE_SIGN_STYLE=Automatic
+
+      - name: Export IPA
         script: |
-          xcode-project build-ipa \
-            --project ios/App/App.xcodeproj \
-            --scheme App
+          xcodebuild -exportArchive \
+            -archivePath ios/App/build/App.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios-export-options.plist
+
     artifacts:
-      - ios/App/build/ipa/*.ipa
+      - build/ios/ipa/*.ipa
+
     publishing:
-      email:
-        recipients:
-          - acaridi57@gmail.com
-        notify:
-          success: true
-          failure: true
       app_store_connect:
         auth: integration
         submit_to_testflight: true
