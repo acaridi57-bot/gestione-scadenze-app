@@ -1,56 +1,61 @@
 workflows:
   ios-capacitor:
-    name: iOS Capacitor – Build & Sign (Automatic Signing)
+    name: iOS Capacitor Build
     max_build_duration: 120
-    instance_type: mac_mini_m1
-    
+    instance_type: mac_mini_m2
+
     integrations:
       app_store_connect: Codemagic
-    
+
     environment:
-      xcode: latest
-      node: 22
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: it.gestionescadenze.app
-      vars: 
-        BUNDLE_ID: it.gestionescadenze.app
-        XCODE_PROJECT: App.xcodeproj
-        XCODE_SCHEME: App
-      
+        bundle_identifier: it.gestionescadenze.GestioneScadenze
+      node: 22.12.0
+      xcode: 26.2
+      cocoapods: default
+
     scripts:
-      - name: Install Node dependencies
+      - name: Install dependencies
         script: |
           npm install
-        
+
       - name: Build web app
         script: |
           npm run build
-            
-      - name: Sync Capacitor iOS
+
+      - name: Sync Capacitor with iOS
         script: |
           npx cap sync ios
-            
-      - name: Build signed archive (AUTOMATIC SIGNING)
+
+      - name: Set up code signing
         script: |
-          cd ios/App
-          xcodebuild \
-            -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Release \
-            -archivePath build/App.xcarchive \
-            archive \
-            -allowProvisioningUpdates \
-            CODE_SIGN_STYLE=Automatic
-    
-      - name: Export IPA
+          keychain initialize
+          app-store-connect fetch-signing-files \
+            it.gestionescadenze.GestioneScadenze \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
+          xcode-project use-profiles
+
+      - name: Build iOS app
         script: |
-          xcodebuild -exportArchive \
-            -archivePath ios/App/build/App.xcarchive \
-            -exportPath build/ios/ipa \
-            -exportOptionsPlist ios-export-options.plist \
-            -allowProvisioningUpdates
+          xcode-project build-ipa \
+            --project ios/App/App.xcodeproj \
+            --scheme App \
+            --output build/ios/ipa
 
     artifacts:
-      - build/ios/ipa/*.ipa
-      - ios/App/build/App.xcarchive
+      - build/ios/ipa/App.ipa
+
+    publishing:
+      email:
+        recipients:
+          - acaridi57@gmail.com
+        notify:
+          success: true
+          failure: true
+
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
