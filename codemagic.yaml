@@ -8,7 +8,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: it.gestionescadenze.GestioneScadenze
+        bundle_identifier: it.gestionescadenze.app
       node: 22.12.0
       xcode: 26.2
       cocoapods: default
@@ -26,7 +26,7 @@ workflows:
         script: |
           keychain initialize
           app-store-connect fetch-signing-files \
-            it.gestionescadenze.GestioneScadenze \
+            it.gestionescadenze.app \
             --type IOS_APP_STORE \
             --create
           keychain add-certificates
