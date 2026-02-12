@@ -42,11 +42,10 @@ workflows:
         script: |
           xcode-project build-ipa \
             --project ios/App/App.xcodeproj \
-            --scheme App \
-            --output build/ios/ipa
+            --scheme App
 
     artifacts:
-      - build/ios/ipa/App.ipa
+      - build/ios/ipa/*.ipa
 
     publishing:
       email:
