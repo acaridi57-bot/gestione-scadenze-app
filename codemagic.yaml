@@ -45,13 +45,12 @@ workflows:
     
       - name: Export IPA
         script: |
-          cd ios/App
           xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/ipa \
-            -exportOptionsPlist ../../ios-export-options.plist \
+            -archivePath ios/App/build/App.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios-export-options.plist \
             -allowProvisioningUpdates
 
     artifacts:
-      - ios/App/build/ipa/*.ipa
+      - build/ios/ipa/*.ipa
       - ios/App/build/App.xcarchive
