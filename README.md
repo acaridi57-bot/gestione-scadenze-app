@@ -4,6 +4,41 @@
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
+## 📱 Build e Sync iOS
+
+### Pulizia cache
+```bash
+rm -rf node_modules/.vite
+rm -rf dist
+rm -rf ios/App/build
+```
+
+### Build web
+```bash
+npm run build
+```
+
+### Verifica build
+```bash
+ls -lh dist/index.html
+head -c 100 dist/index.html
+```
+
+### Sync iOS (con force)
+```bash
+npx cap sync ios --force
+```
+
+### Verifica sync
+```bash
+ls -lh ios/App/App/public/
+```
+
+### Apri in Xcode
+```bash
+npx cap open ios
+```
+
 ## How can I edit this code?
 
 There are several ways of editing your application.

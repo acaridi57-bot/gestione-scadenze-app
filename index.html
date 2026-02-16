@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     
+    <!-- Content Security Policy - Permissive for iOS debugging -->
+    <meta 
+      http-equiv="Content-Security-Policy" 
+      content="default-src * 'unsafe-inline' 'unsafe-eval' data: gap: content:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval';"
+    />
+    
     <title>Gestione Scadenze</title>
     <meta name="description" content="Gestisci le tue finanze personali: transazioni, promemoria, scadenze e notifiche. App disponibile su iOS, Android, Windows e Mac." />
     <meta name="author" content="Gestione Scadenze" />
