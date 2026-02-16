@@ -16,14 +16,17 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error('  VITE_SUPABASE_ANON_KEY=your-anon-key');
   console.error('');
   console.error('Ottieni le credenziali da: https://supabase.com/dashboard/project/_/settings/api');
+  
+  // Usa valori placeholder per evitare crash immediati
+  // Il client fallirà in modo più graceful sulle chiamate API
 }
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(
-  SUPABASE_URL || '', 
-  SUPABASE_ANON_KEY || '', 
+  SUPABASE_URL || 'https://placeholder.supabase.co', 
+  SUPABASE_ANON_KEY || 'placeholder-key', 
   {
     auth: {
       storage: localStorage,
