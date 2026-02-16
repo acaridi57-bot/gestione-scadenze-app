@@ -18,63 +18,91 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.png", "robots.txt", "pwa-*.png"],
       injectRegister: "auto",
+      devOptions: {
+        enabled: true,
+        type: 'module'
+      },
       manifest: {
         name: "Gestione Scadenze",
-        short_name: "GestScadenze",
-        description: "Gestione delle tue finanze personali - Transazioni, Promemoria e Scadenze",
+        short_name: "Scadenze",
+        description: "Gestisci le tue finanze personali: transazioni, promemoria e scadenze",
         theme_color: "#16a34a",
         background_color: "#ffffff",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
         start_url: "/",
+        lang: "it",
+        dir: "ltr",
+        categories: ["finance", "productivity", "utilities"],
         icons: [
           {
             src: "/pwa-72x72.png",
             sizes: "72x72",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-96x96.png",
-            sizes: "96x96",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-128x128.png",
-            sizes: "128x128",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-144x144.png",
-            sizes: "144x144",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-152x152.png",
-            sizes: "152x152",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-384x384.png",
-            sizes: "384x384",
-            type: "image/png"
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
             type: "image/png",
             purpose: "any"
           },
           {
+            src: "/pwa-96x96.png",
+            sizes: "96x96",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/pwa-128x128.png",
+            sizes: "128x128",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/pwa-144x144.png",
+            sizes: "144x144",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/pwa-152x152.png",
+            sizes: "152x152",
+            type: "image/png",
+            purpose: "any"
+          },
+          {
+            src: "/pwa-192x192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "any maskable"
+          },
+          {
             src: "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "maskable"
+            purpose: "any maskable"
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Nuova Transazione",
+            short_name: "Transazione",
+            description: "Aggiungi una nuova transazione",
+            url: "/transactions",
+            icons: [
+              {
+                src: "/pwa-192x192.png",
+                sizes: "192x192"
+              }
+            ]
+          },
+          {
+            name: "Promemoria",
+            short_name: "Promemoria",
+            description: "Visualizza i promemoria",
+            url: "/reminders",
+            icons: [
+              {
+                src: "/pwa-192x192.png",
+                sizes: "192x192"
+              }
+            ]
           }
         ]
       },
