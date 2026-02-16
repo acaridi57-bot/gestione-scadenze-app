@@ -1,8 +1,111 @@
-# Welcome to your Lovable project
+# Gestione Scadenze - Progressive Web App
 
-## Project info
+App di gestione finanze personali installabile come PWA su iOS, Android e Desktop.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🌐 Deploy come PWA (Progressive Web App)
+
+### Setup iniziale
+
+1. **Configura Supabase**
+
+Copia il file `.env.example` in `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Modifica `.env` e inserisci le tue credenziali Supabase:
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+Ottieni le credenziali da: [Supabase Dashboard](https://supabase.com/dashboard/project/_/settings/api)
+
+2. **Installa dipendenze**
+
+```bash
+npm install
+```
+
+3. **Build per produzione**
+
+```bash
+npm run build
+```
+
+Questo crea la cartella `dist/` pronta per il deploy.
+
+### Deploy
+
+Puoi hostare la PWA su qualsiasi piattaforma:
+
+#### Vercel (consigliato)
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+#### Netlify
+```bash
+npm install -g netlify-cli
+netlify deploy --prod --dir=dist
+```
+
+#### Firebase Hosting
+```bash
+firebase deploy
+```
+
+#### Hosting generico
+Carica il contenuto della cartella `dist/` su qualsiasi web server.
+
+### Installazione su dispositivi
+
+**iPhone/iPad (Safari):**
+1. Apri il sito da Safari
+2. Tap sull'icona "Condividi" 
+3. Scorri e tap "Aggiungi a Home"
+4. L'app appare come icona sulla Home!
+
+**Android (Chrome):**
+1. Apri il sito da Chrome
+2. Tap sui 3 puntini
+3. "Installa app" o "Aggiungi a Home"
+
+**Desktop (Chrome/Edge):**
+1. Apri il sito
+2. Clicca sull'icona "Installa" nella barra degli indirizzi
+3. L'app si installa come app desktop
+
+### Sviluppo locale
+
+```bash
+npm run dev
+```
+
+Apri http://localhost:5173
+
+### Requisiti PWA
+
+✅ HTTPS (o localhost per sviluppo)
+✅ manifest.webmanifest
+✅ Service Worker (per offline)
+✅ Icone corrette
+
+Tutto è già configurato in questo progetto!
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+- Supabase (Backend & Auth)
 
 ## How can I edit this code?
 
@@ -50,24 +153,3 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
